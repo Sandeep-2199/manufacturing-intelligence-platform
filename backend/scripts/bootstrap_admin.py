@@ -26,7 +26,7 @@ def main():
         try:
             credentials = Credentials(username="teamadmin", password=password)
         except ValidationError:
-            raise SystemExit("MIP_BOOTSTRAP_ADMIN_PASSWORD must be 12–128 characters.") from None
+            raise SystemExit("MIP_BOOTSTRAP_ADMIN_PASSWORD must be 8–128 characters.") from None
 
         if db.scalar(select(TeamUser.user_id).where(TeamUser.username == credentials.username)) is not None:
             raise SystemExit("Bootstrap could not create teamadmin because that username already exists.")

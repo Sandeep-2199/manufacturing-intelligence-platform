@@ -207,7 +207,7 @@ async function manageTeam() {
 function addAccount() {
   openEditor("Add team account", [
     field("username", "Username", "", { required: true, limit: 64 }),
-    field("password", "Password (12–128 characters)", "", {
+    field("password", "Password (8–128 characters)", "", {
       type: "password", autocomplete: "new-password", required: true, limit: 128,
     }),
     field("role", "Role", "viewer", { choices: [["viewer", "Viewer"], ["editor", "Editor"], ["admin", "Administrator"]] }),

@@ -41,7 +41,7 @@ import sys
 from scripts import manage_account
 
 sys.argv = ["manage_account", "create-admin", "testadmin"]
-manage_account.getpass = lambda _: "Local test password 42!"
+manage_account.getpass = lambda _: "Test123!"
 manage_account.main()
 PY
 

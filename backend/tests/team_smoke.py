@@ -7,7 +7,7 @@ from urllib.error import HTTPError
 from urllib.request import HTTPCookieProcessor, Request, build_opener
 
 
-PASSWORD = "Local test password 42!"
+PASSWORD = "Test123!"
 
 
 def browser():

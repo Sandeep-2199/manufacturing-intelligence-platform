@@ -16,7 +16,7 @@ class Username(BaseModel):
 
 
 class Credentials(Username):
-    password: SecretStr = Field(min_length=12, max_length=128)
+    password: SecretStr = Field(min_length=8, max_length=128)
 
 
 class AccountCreate(Credentials):

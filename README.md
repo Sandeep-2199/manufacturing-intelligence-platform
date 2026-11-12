@@ -17,7 +17,7 @@ python -m scripts.seed_demo  # Optional sample data
 python -m uvicorn app.main:app --reload
 ```
 
-Create the administrator once. The command prompts for a password of at least 12 characters. For a fresh checkout, first create a virtual environment with `python3 -m venv venv`, activate it, and install `requirements.txt` from `backend`.
+Create the administrator once. The command prompts for a password of at least 8 characters. For a fresh checkout, first create a virtual environment with `python3 -m venv venv`, activate it, and install `requirements.txt` from `backend`.
 
 Open [the dashboard](http://127.0.0.1:8000/dashboard/) and sign in. [API docs](http://127.0.0.1:8000/docs) can use the same browser session.
 
@@ -64,7 +64,7 @@ Customer accounts can only view their company's jobs. The API looks up the compa
 ## Deploy a portfolio demo on Render
 
 1. Push the repository to GitHub. In Render, choose **New → Blueprint**, connect that repository, and select the branch containing `render.yaml`.
-2. Enter a unique 12–128 character password for `MIP_BOOTSTRAP_ADMIN_PASSWORD` in the Render setup prompt. The first start applies the migrations and creates `teamadmin`. Later starts leave existing administrators alone. Remove the bootstrap variable from the service environment after signing in successfully.
+2. Enter a unique 8–128 character password for `MIP_BOOTSTRAP_ADMIN_PASSWORD` in the Render setup prompt. The first start applies the migrations and creates `teamadmin`. Later starts leave existing administrators alone. Remove the bootstrap variable from the service environment after signing in successfully.
 3. Once the service is live, open its Render URL followed by `/dashboard/` and sign in as `teamadmin`. For a public portfolio walkthrough, create a viewer account with a separate password.
 4. Optionally set `OPENAI_API_KEY` in the Render service's **Environment** settings to enable generation. Use a key with available API quota. Use synthetic records for public demos.
 

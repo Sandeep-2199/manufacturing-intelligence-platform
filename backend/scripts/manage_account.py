@@ -27,7 +27,7 @@ def main():
         try:
             credentials = Credentials(username=username, password=password)
         except ValidationError:
-            parser.error("Use a 3–64 character username and a 12–128 character password")
+            parser.error("Use a 3–64 character username and a 8–128 character password")
         password_hash = hash_password(credentials.password.get_secret_value())
 
     with SessionLocal.begin() as db:
