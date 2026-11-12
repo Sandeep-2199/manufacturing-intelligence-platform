@@ -1,0 +1,66 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mip
+      POSTGRES_DB: mip
+      POSTGRES_PASSWORD: ${MIP_DB_PASSWORD:?Set MIP_DB_PASSWORD in the deployment .env}
+    volumes:
+      - database:/var/lib/postgresql/data
+    networks:
+      - database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mip -d mip"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg://mip:${MIP_DB_PASSWORD:?Set MIP_DB_PASSWORD in the deployment .env}@db:5432/mip
+      MIP_ORIGIN: https://${MIP_DOMAIN:?Set MIP_DOMAIN in the deployment .env}
+      MIP_SECURE_COOKIE: "true"
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      MIP_LLM_MODEL: ${MIP_LLM_MODEL:-gpt-4.1-mini}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - database
+      - web
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://localhost:8000/health/db', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      MIP_DOMAIN: ${MIP_DOMAIN:?Set MIP_DOMAIN in the deployment .env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      - web
+
+networks:
+  database:
+    internal: true
+  web:
+
+volumes:
+  database:
+  caddy_data:
+  caddy_config:

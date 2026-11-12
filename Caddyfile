@@ -1,0 +1,4 @@
+{$MIP_DOMAIN} {
+    redir / /dashboard/
+    reverse_proxy app:8000
+}

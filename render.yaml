@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: manufacturing-intelligence
+    runtime: docker
+    plan: free
+    region: ohio
+    healthCheckPath: /health/db
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: manufacturing-intelligence-db
+          property: connectionString
+      - key: MIP_SECURE_COOKIE
+        value: "true"
+      - key: MIP_BOOTSTRAP_ADMIN_PASSWORD
+        sync: false
+
+databases:
+  - name: manufacturing-intelligence-db
+    plan: free
+    region: ohio
+    postgresMajorVersion: "16"
+    ipAllowList: []

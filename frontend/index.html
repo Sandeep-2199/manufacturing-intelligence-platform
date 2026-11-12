@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Manufacturing Intelligence</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="dashboard.js" defer></script>
+  <script src="team.js" defer></script>
+  <script src="work.js" defer></script>
+  <script src="operations.js" defer></script>
+  <script src="assistant.js" defer></script>
+</head>
+<body class="staff-ui">
+  <header class="masthead">
+    <div class="masthead-inner">
+      <span class="brand-mark" aria-hidden="true">MI</span>
+      <span class="brand">Manufacturing Intelligence</span>
+      <a href="/customer/sign-in">Customer portal</a>
+      <a href="/docs">API docs <span aria-hidden="true">↗</span></a>
+      <button type="button" id="sign-out" hidden>Sign out</button>
+    </div>
+  </header>
+  <main id="sign-in" hidden>
+    <form id="login-form" class="login-card">
+      <h1>Team sign-in</h1>
+      <label>Username <input name="username" autocomplete="username" required maxlength="64"></label>
+      <label>Password <input type="password" name="password" autocomplete="current-password" required maxlength="128"></label>
+      <button class="primary" type="submit">Sign in</button>
+      <p id="login-message" role="alert"></p>
+    </form>
+  </main>
+  <main id="dashboard" hidden>
+    <nav class="ops-nav" aria-label="Manufacturing workspace">
+      <strong>Manufacturing ERP</strong>
+      <button type="button" data-view="overview" aria-current="page">Overview</button>
+      <button type="button" data-view="production">Production</button>
+      <button type="button" data-view="inventory">Inventory</button>
+      <button type="button" data-view="orders">Work orders</button>
+      <button type="button" data-view="machines">Machines</button>
+      <button type="button" data-view="quality">Quality control</button>
+      <button type="button" data-view="sourcing">Sourcing</button>
+      <button type="button" data-view="assistant">Ask Manufacturing</button>
+    </nav>
+    <div class="ops-content">
+      <div class="ops-header">
+        <span id="identity"></span>
+        <button type="button" id="manage-team" hidden>Team accounts</button>
+      </div>
+      <section id="ops-view" aria-label="Manufacturing operations"></section>
+      <section id="sourcing-view" hidden>
+    <h1>Supplier comparison</h1>
+    <p class="intro">Choose a product to compare supplier pricing and lead times.</p>
+    <div class="toolbar">
+      <button type="button" id="add-product" hidden>Add product</button>
+      <button type="button" id="manage-vendors" hidden>Manage vendors</button>
+    </div>
+    <div class="workspace">
+      <aside class="catalog">
+        <h2>Products</h2>
+        <label for="search">Search by name or part number</label>
+        <input type="search" id="search" placeholder="Search products" disabled>
+        <ul id="products" aria-label="Products"></ul>
+        <p id="catalog-message" role="status">Loading products…</p>
+      </aside>
+      <section class="comparison" aria-labelledby="product-name" aria-busy="true">
+        <div class="product-header">
+          <div>
+            <p id="part-number" class="part-number" hidden></p>
+            <h2 id="product-name">Product details</h2>
+            <p id="product-meta" class="muted" hidden></p>
+          </div>
+          <span id="product-status" class="status" hidden></span>
+        </div>
+        <div id="product-actions" class="toolbar" hidden>
+          <button type="button" id="edit-product">Edit product</button>
+          <button type="button" id="deactivate-product">Deactivate</button>
+          <button type="button" id="link-vendor">Link vendor</button>
+        </div>
+        <p id="comparison-message" role="status">Loading product details…</p>
+        <div id="results" hidden>
+          <dl class="metrics">
+            <div><dt>Suppliers</dt><dd id="supplier-count"></dd></div>
+            <div><dt>Lowest unit price</dt><dd id="lowest-price"></dd></div>
+            <div><dt>Shortest lead time</dt><dd id="shortest-lead"></dd></div>
+          </dl>
+          <div class="table-heading">
+            <h3>Supplier offers</h3>
+            <label for="sort">Sort by
+              <select id="sort">
+                <option value="unit_price">Unit price</option>
+                <option value="lead_time_days">Lead time</option>
+              </select>
+            </label>
+          </div>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Supplier offers">
+            <table aria-label="Supplier offers">
+              <thead><tr><th scope="col">Supplier</th><th scope="col">Unit price</th><th scope="col">Lead time</th><th id="offer-actions" scope="col" hidden>Actions</th></tr></thead>
+              <tbody id="suppliers"></tbody>
+            </table>
+          </div>
+          <p class="table-note">A dash indicates terms that haven’t been recorded.</p>
+        </div>
+      </section>
+    </div>
+      </section>
+      <p id="dashboard-message" role="status"></p>
+    </div>
+  </main>
+  <dialog id="editor" aria-labelledby="editor-title">
+    <form id="editor-form">
+      <h2 id="editor-title"></h2>
+      <div id="editor-fields"></div>
+      <p id="editor-message" role="alert"></p>
+      <div class="toolbar">
+        <button type="button" id="close-editor">Close</button>
+        <button class="primary" type="submit" id="save-editor">Save</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Customer portal | Manufacturing Intelligence</title>
+  <link rel="stylesheet" href="/dashboard/styles.css">
+  <script src="/dashboard/customer.js" defer></script>
+</head>
+<body class="customer-ui">
+  <header class="masthead">
+    <div class="masthead-inner">
+      <span class="brand-mark" aria-hidden="true">MI</span>
+      <span class="brand">Manufacturing Intelligence</span>
+      <a href="/dashboard/">Team workspace</a>
+      <button type="button" id="sign-out" hidden>Sign out</button>
+    </div>
+  </header>
+  <main>
+    <form id="customer-login" class="login-card" hidden>
+      <h1>Customer sign-in</h1>
+      <label>Username <input name="username" required autocomplete="username" maxlength="64"></label>
+      <label>Password <input name="password" type="password" required autocomplete="current-password" maxlength="128"></label>
+      <button type="submit" class="primary">Sign in</button>
+    </form>
+    <form id="customer-invite" class="login-card" hidden>
+      <h1>Accept your invitation</h1>
+      <label>Choose a password <input name="password" type="password" required minlength="12" maxlength="128" autocomplete="new-password"></label>
+      <label>Confirm password <input name="confirmation" type="password" required minlength="12" maxlength="128" autocomplete="new-password"></label>
+      <button type="submit" class="primary">Activate account</button>
+    </form>
+    <section id="my-jobs" hidden aria-labelledby="jobs-title">
+      <p id="company-name" class="customer-company"></p>
+      <h1 id="jobs-title">Customer portal</h1>
+      <div id="job-summary" class="customer-summary" aria-label="Job summary"></div>
+      <div class="customer-table-panel">
+      <div class="customer-toolbar">
+        <h2>My jobs</h2>
+        <label>Search jobs <input id="job-search" type="search" placeholder="Reference or job name"></label>
+        <label>Status <select id="job-filter">
+          <option value="">All statuses</option><option value="received">Received</option>
+          <option value="in_progress">In progress</option><option value="ready">Ready</option>
+          <option value="delivered">Delivered</option><option value="cancelled">Cancelled</option>
+        </select></label>
+        <button class="primary" type="button" id="refresh-jobs">Refresh jobs</button>
+      </div>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="Customer jobs">
+        <table class="job-table">
+          <thead>
+            <tr><th scope="col">Job reference</th><th scope="col">Job</th><th scope="col">Status</th><th scope="col">Expected delivery</th></tr>
+          </thead>
+          <tbody id="job-rows"></tbody>
+        </table>
+      </div>
+      <p id="no-jobs" class="table-note" hidden>No jobs have been assigned to your company yet.</p>
+      </div>
+    </section>
+    <p id="customer-message" role="status">Checking your session…</p>
+  </main>
+</body>
+</html>
