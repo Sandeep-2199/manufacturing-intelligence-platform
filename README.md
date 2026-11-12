@@ -70,6 +70,12 @@ Customer accounts can only view their company's jobs. The API looks up the compa
 
 The Blueprint creates an Ohio web service and a private PostgreSQL database on Render's free plans. The free database expires after 30 days. Render manages HTTPS and the application uses its internal database URL. The hosted database starts empty.
 
+### Recover the hosted team administrator password
+
+In the Render web service's **Environment** settings, set `MIP_TEAMADMIN_RECOVERY_EMAIL` to an inbox controlled by the administrator, `MIP_RECOVERY_FROM` to a sender authorized in Resend, and `RESEND_API_KEY` to a Resend sending key. The app uses Render's `RENDER_EXTERNAL_URL` for the reset link. Save and deploy.
+
+On the team sign-in page, select **Forgot password?** and enter `teamadmin`. Open the email link within 20 minutes and choose a new password. The link works once and a successful reset signs out all existing sessions. Recovery is configured for `teamadmin`. Other accounts can use the account management command.
+
 ## Deploy on a team host
 
 You need a host running Docker Compose, a DNS name pointed at that host, and inbound ports 80 and 443 for Caddy. Run these from the repo root on that host. Set `MIP_DOMAIN` to the team's hostname and generate a unique hex database password.

@@ -50,6 +50,8 @@ def main():
                 user.is_active = False
             else:
                 user.password_hash = password_hash
+            user.reset_token_hash = None
+            user.reset_expires_at = None
             db.execute(delete(TeamSession).where(TeamSession.user_id == user.user_id))
     print(f"{args.action} completed for {username}")
 

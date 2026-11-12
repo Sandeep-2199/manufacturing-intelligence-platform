@@ -230,6 +230,34 @@ elements["login-form"].addEventListener("submit", async event => {
   }
 });
 
+elements["forgot-password"].addEventListener("click", () => {
+  openEditor("Request a password reset", [
+    field("username", "Username", elements["login-form"].elements.username.value, {
+      required: true, limit: 64, autocomplete: "username",
+    }),
+  ], async data => {
+    const result = await api("/auth/password-reset/request", { method: "POST", data });
+    editor.close();
+    elements["login-message"].textContent = result.message;
+  }, "Send reset link");
+});
+
+function openPasswordReset(token) {
+  openEditor("Choose a new password", [
+    field("password", "New password (8–128 characters)", "", {
+      type: "password", required: true, limit: 128, autocomplete: "new-password",
+    }),
+    field("confirm", "Confirm new password", "", {
+      type: "password", required: true, limit: 128, autocomplete: "new-password",
+    }),
+  ], async ({ password, confirm }) => {
+    if (password.length < 8) throw new Error("Enter at least 8 characters.");
+    if (password !== confirm) throw new Error("Passwords differ.");
+    await api("/auth/password-reset/confirm", { method: "POST", data: { token, password } });
+    showLogin("Password reset. Sign in with your new password.");
+  }, "Reset password");
+}
+
 elements["sign-out"].addEventListener("click", async () => {
   try {
     await api("/auth/logout", { method: "POST" });
@@ -280,6 +308,11 @@ elements["deactivate-product"].addEventListener("click", () => {
   }, "Deactivate");
 });
 
+const resetLink = window.location.hash.match(/^#reset=([A-Za-z0-9_-]{43})$/);
+if (resetLink) history.replaceState(null, "", window.location.pathname + window.location.search);
+
 api("/auth/me").then(showDashboard).catch(error => {
   showLogin(error.message === "Sign in to continue" ? "" : error.message);
+}).finally(() => {
+  if (resetLink) openPasswordReset(resetLink[1]);
 });

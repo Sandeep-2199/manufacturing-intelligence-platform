@@ -13,6 +13,8 @@ class TeamUser(Base):
     role = Column(String(10), nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
     company_id = Column(Integer, ForeignKey(CustomerCompany.company_id))
+    reset_token_hash = Column(String(64), unique=True)
+    reset_expires_at = Column(DateTime(timezone=True))
 
 
 class TeamSession(Base):

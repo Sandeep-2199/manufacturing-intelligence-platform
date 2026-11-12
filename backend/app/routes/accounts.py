@@ -8,7 +8,8 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.account import LoginAttempt, TeamSession, TeamUser
-from app.schemas.account import AccountCreate, AccountResponse, Credentials
+from app.schemas.account import AccountCreate, AccountResponse, Credentials, PasswordReset, Username
+from app.services.recovery import recovery_email, send_reset_email
 from app.services.security import (
     COOKIE_NAME,
     SECURE_COOKIE,
@@ -23,6 +24,58 @@ from app.services.security import (
 router = APIRouter(prefix="/auth", tags=["Team access"])
 admin = APIRouter(prefix="/team", tags=["Team access"], dependencies=[Depends(require_admin)])
 SESSION_SECONDS = 8 * 60 * 60
+RESET_LIFETIME = timedelta(minutes=20)
+
+
+@router.post("/password-reset/request", status_code=202)
+def request_password_reset(account: Username, db: Session = Depends(get_db)):
+    recipient = recovery_email()
+    if not recipient:
+        raise HTTPException(503, "Password recovery is unavailable. Contact your administrator.")
+    message = {"message": "If recovery is configured for this account, check your inbox for a reset link."}
+    if account.username != "teamadmin":
+        return message
+
+    now = datetime.now(timezone.utc)
+    user = db.scalar(select(TeamUser).where(
+        TeamUser.username == account.username, TeamUser.is_active.is_(True), TeamUser.role == "admin",
+    ).with_for_update())
+    if user is None or (user.reset_expires_at and user.reset_expires_at > now):
+        return message
+
+    token = secrets.token_urlsafe(32)
+    digest = token_digest(f"{recipient}:{token}")
+    user.reset_token_hash = digest
+    user.reset_expires_at = now + RESET_LIFETIME
+    db.commit()
+    if not send_reset_email(recipient, token):
+        failed = db.scalar(select(TeamUser).where(
+            TeamUser.reset_token_hash == digest,
+        ).with_for_update())
+        if failed:
+            failed.reset_token_hash = None
+            failed.reset_expires_at = now + timedelta(minutes=1)
+        db.commit()
+    return message
+
+
+@router.post("/password-reset/confirm", status_code=204)
+def confirm_password_reset(reset: PasswordReset, db: Session = Depends(get_db)):
+    recipient = recovery_email()
+    if not recipient:
+        raise HTTPException(503, "Password recovery is unavailable. Contact your administrator.")
+    user = db.scalar(select(TeamUser).where(
+        TeamUser.username == "teamadmin", TeamUser.role == "admin", TeamUser.is_active.is_(True),
+        TeamUser.reset_token_hash == token_digest(f"{recipient}:{reset.token.get_secret_value()}"),
+        TeamUser.reset_expires_at > datetime.now(timezone.utc),
+    ).with_for_update())
+    if user is None:
+        raise HTTPException(400, "This reset link is invalid or has expired.")
+    user.password_hash = hash_password(reset.password.get_secret_value())
+    user.reset_token_hash = None
+    user.reset_expires_at = None
+    db.execute(delete(TeamSession).where(TeamSession.user_id == user.user_id))
+    db.commit()
 
 
 @router.post("/login", response_model=AccountResponse)
