@@ -3,7 +3,7 @@ from pathlib import Path
 from fastapi import Depends, FastAPI, Request
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from app.database import engine
@@ -61,13 +61,9 @@ def customer_portal():
     return FileResponse(frontend / "customer.html")
 
 
-# Basic health check
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"], include_in_schema=False)
 def home():
-
-    return {
-        "message": "Manufacturing Intelligence Platform API is running"
-    }
+    return RedirectResponse("/dashboard/", status_code=302)
 
 
 # Check database connection
